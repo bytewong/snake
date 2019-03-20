@@ -15,10 +15,11 @@
     //地图类
     function Map()
     {
-        this.width=600; //地图宽度
+        this.width=1600; //地图宽度
         this.height=800; //地图高度
         this.position='absolute'; //定位方式
-        this.color='#ccccc1'; //地图颜色
+        this.color='#ccccc0'; //地图颜色
+		this.background="url(1.png)";
         this._map=null; //保存地图dom元素
         
         this.show=function()
@@ -31,7 +32,7 @@
             this._map.style.height = this.height + 'px';
             this._map.style.position = this.position ;
             this._map.style.backgroundColor = this.color ;
-            
+            this._map.style.background = this.background;
             //将地图div元素追加到body标签之间
             document.getElementsByTagName('body')[0].appendChild(this._map);
         };
@@ -40,8 +41,8 @@
     //食物类
     function Food()
     {
-        this.width=67; //宽度
-        this.height=71; //高度
+        this.width=80; //宽度
+        this.height=80; //高度
         this.position='absolute'; //定位方式
         this.color='#00ff00'; //食物颜色
 		this.background="url(girl.png)";
@@ -66,23 +67,23 @@
                 map._map.appendChild(this._food);
             }
             //如果之前创建过，只需要重新设置坐标
-            this.x=Math.floor(Math.random()*40);
-            this.y=Math.floor(Math.random()*20);
+            this.x=Math.floor(Math.random()*20);
+            this.y=Math.floor(Math.random()*10);
             this._food.style.left = this.x*this.width+'px';
             this._food.style.top = this.y*this.height+'px';
         };
     }
-
+    
     //蛇类
     function Snake()
     {
-        this.width=67;    //蛇节宽度
-        this.height=72;    //蛇节高度
+        this.width=80;    //蛇节宽度
+        this.height=80;    //蛇节高度
         this.position='absolute'; //蛇节定位方式
         this.direct=''; //蛇的移动方向
         //所有蛇节全部信息
+        this.body=[[3,2,'red',null],[2,2,'orange',null],[1,2,'orange',null]];
         
-        this.body=[[3,2,'red',null],[2,2,'blue',null],[1,2,'blue',null]];
         this.setDirect = function(code)
         {
             switch(code)
@@ -104,12 +105,13 @@
         
         this.show=function()
         {
+			 
             //用于显示蛇
             for(var i=0;i<this.body.length;i++)
             {
                 if(this.body[i][3]==null)
                 {
-                    if(i == 0) {
+					if(i == 0) {
 						this.body[i][3] = document.createElement('div');
 						this.body[i][3].style.width = this.width +'px';
 						this.body[i][3].style.height = this.height +'px';
@@ -125,7 +127,6 @@
 						this.body[i][3].style.backgroundColor = this.body[i][2];
 						map._map.appendChild(this.body[i][3]);
 					}
-    
                 }
                 //设置蛇节的横纵坐标
                 this.body[i][3].style.left=this.body[i][0]*this.width+'px';
@@ -134,7 +135,7 @@
         }
         
         this.move = function()
-        {
+        {   
             //移动蛇身
             var length = this.body.length-1;
             for(var i=length;i>0;i--)
@@ -169,12 +170,12 @@
                 var y=this.body[length][1];
                 sum++;
                 document.title='分数:'+sum+'分';
-                this.body.push([x,y,'blue',null]);
+                this.body.push([x,y,'orange',null]);
                 food.show();
             }
             
             //判断撞墙死
-            if(this.body[0][0]<0 || this.body[0][0]>39 ||this.body[0][1]<0 ||this.body[0][1]>19)
+            if(this.body[0][0]<0 || this.body[0][0]>19 ||this.body[0][1]<0 ||this.body[0][1]>9)
             {
                 alert('撞墙死');
                 clearTimeout(timer);
@@ -208,7 +209,7 @@
         snake = new Snake(); //实例化蛇类对象
         snake.show();
         timer = setInterval('snake.move()',100);
-        
+        /*
         document.onkeydown = function()
         {
             var code;
@@ -220,6 +221,25 @@
                 code = event.keyCode;
             }
             snake.setDirect(code);
+        };
+        */
+        var _direct = null;
+
+        document.onkeydown = function(){
+        var code;
+        if(window.event){
+        code = window.event.keyCode;
+        }else{
+        code = event.keyCode;
+        }
+
+        //这几个键的冲突关系是按了右键下一次不能按左键，对应的keyCode刚好是下面这样，相减之后绝对值不能为2
+        if(Math.abs(_direct - code) == 2){
+        return;
+        }
+        snake.setDirect(code);
+        //记录上一次的按键
+        _direct = code;
         };
         
         
